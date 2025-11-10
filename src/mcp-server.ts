@@ -18,7 +18,7 @@ export interface MCPServerOptions {
 }
 
 export function createMCPServer(options: MCPServerOptions): McpServer {
-  const { logStore, name = 'vite-plugin-terminal-mcp', version = '1.0.0' } = options
+  const { logStore, name = 'vite-plugin-terminal-mcp', version = '1.4.1' } = options
 
   const server = new McpServer({
     name,
@@ -26,102 +26,127 @@ export function createMCPServer(options: MCPServerOptions): McpServer {
   })
 
   // Tool: Get Console Errors
-  server.tool(
+  server.registerTool(
     'get-console-errors',
-    'Retrieve recent console errors from the browser. Returns the most recent error messages logged to the browser console.',
     {
-      count: z.number()
-        .optional()
-        .default(10)
-        .describe('Number of recent errors to retrieve (default: 10)'),
+      title: 'Get Console Errors',
+      description: 'Retrieve recent console errors from the browser. Returns the most recent error messages logged to the browser console.',
+      inputSchema: { count: z.number() } as any,
+      outputSchema: { errors: z.array(z.any()) } as any,
     },
-    async ({ count = 10 }) => {
-      const errors = logStore.getRecentErrors(count)
+    async ({ count }: any) => {
+      const errors = logStore.getRecentErrors(count ?? 10)
+      const output = { errors, count: errors.length }
       return {
         content: [{
-          type: 'text',
+          type: 'text' as const,
           text: formatLogs(errors, 'Recent Console Errors'),
         }],
+        structuredContent: output,
       }
     },
   )
 
   // Tool: Get Console Logs
-  server.tool(
+  server.registerTool(
     'get-console-logs',
-    'Retrieve recent console logs from the browser. Can filter by log level (log, info, debug, warn, error).',
     {
-      count: z.number()
-        .optional()
-        .default(50)
-        .describe('Number of recent logs to retrieve (default: 50)'),
-      level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all'])
-        .optional()
-        .default('all')
-        .describe('Filter logs by level (default: all)'),
+      title: 'Get Console Logs',
+      description: 'Retrieve recent console logs from the browser. Can filter by log level (log, info, debug, warn, error).',
+      inputSchema: {
+        count: z.number(),
+        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']),
+      } as any,
+      outputSchema: { logs: z.array(z.any()), count: z.number() } as any,
     },
-    async ({ count = 50, level = 'all' }) => {
-      const logs = level === 'all'
-        ? logStore.getRecent(count)
-        : logStore.getByLevel(level as any).slice(-count)
+    async ({ count, level }: any) => {
+      const finalCount = count ?? 50
+      const finalLevel = level ?? 'all'
+      const logs = finalLevel === 'all'
+        ? logStore.getRecent(finalCount)
+        : logStore.getByLevel(finalLevel as any).slice(-finalCount)
 
+      const output = { logs, count: logs.length, level: finalLevel }
       return {
         content: [{
-          type: 'text',
-          text: formatLogs(logs, `Recent Console Logs${level !== 'all' ? ` (${level})` : ''}`),
+          type: 'text' as const,
+          text: formatLogs(logs, `Recent Console Logs${finalLevel !== 'all' ? ` (${finalLevel})` : ''}`),
         }],
+        structuredContent: output,
       }
     },
   )
 
   // Tool: Get Console Logs Since
-  server.tool(
+  server.registerTool(
     'get-console-logs-since',
-    'Retrieve console logs since a specific timestamp.',
     {
-      timestamp: z.number()
-        .describe('Unix timestamp in milliseconds'),
-      level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all'])
-        .optional()
-        .default('all')
-        .describe('Filter logs by level (default: all)'),
+      title: 'Get Console Logs Since',
+      description: 'Retrieve console logs since a specific timestamp.',
+      inputSchema: {
+        timestamp: z.number(),
+        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']),
+      } as any,
+      outputSchema: { logs: z.array(z.any()), count: z.number(), since: z.string() } as any,
     },
-    async ({ timestamp, level = 'all' }) => {
+    async ({ timestamp, level }: any) => {
+      const finalLevel = level ?? 'all'
       let logs = logStore.getSince(timestamp)
-      if (level !== 'all')
-        logs = logs.filter(log => log.method === level)
+      if (finalLevel !== 'all')
+        logs = logs.filter(log => log.method === finalLevel)
 
+      const output = { logs, count: logs.length, since: new Date(timestamp).toISOString(), level: finalLevel }
       return {
         content: [{
-          type: 'text',
+          type: 'text' as const,
           text: formatLogs(logs, `Console Logs Since ${new Date(timestamp).toISOString()}`),
         }],
+        structuredContent: output,
       }
     },
   )
 
   // Tool: Clear Console Logs
-  server.tool(
+  server.registerTool(
     'clear-console-logs',
-    'Clear all stored console logs from memory.',
-    {},
+    {
+      title: 'Clear Console Logs',
+      description: 'Clear all stored console logs from memory.',
+      inputSchema: {} as any,
+      outputSchema: { cleared: z.number(), success: z.boolean() } as any,
+    },
     async () => {
       const previousSize = logStore.size
       logStore.clear()
+      const output = { cleared: previousSize, success: true }
       return {
         content: [{
-          type: 'text',
+          type: 'text' as const,
           text: `Cleared ${previousSize} console logs from memory.`,
         }],
+        structuredContent: output,
       }
     },
   )
 
   // Tool: Get Console Stats
-  server.tool(
+  server.registerTool(
     'get-console-stats',
-    'Get statistics about stored console logs (total count, error count, etc.).',
-    {},
+    {
+      title: 'Get Console Stats',
+      description: 'Get statistics about stored console logs (total count, error count, etc.).',
+      inputSchema: {} as any,
+      outputSchema: {
+        total: z.number(),
+        errors: z.number(),
+        warnings: z.number(),
+        info: z.number(),
+        debug: z.number(),
+        log: z.number(),
+        oldestTimestamp: z.number().nullable(),
+        newestTimestamp: z.number().nullable(),
+      } as any,
+    },
     async () => {
       const all = logStore.getAll()
       const errors = logStore.getErrors()
@@ -143,9 +168,10 @@ export function createMCPServer(options: MCPServerOptions): McpServer {
 
       return {
         content: [{
-          type: 'text',
+          type: 'text' as const,
           text: `Console Log Statistics:\n${JSON.stringify(stats, null, 2)}`,
         }],
+        structuredContent: stats,
       }
     },
   )

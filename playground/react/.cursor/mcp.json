@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "vite-terminal-playground-mcp": {
+      "url": "http://localhost:3333/__terminal_mcp"
+    }
+  }
+}

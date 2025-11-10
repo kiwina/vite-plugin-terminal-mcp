@@ -48,10 +48,14 @@ function App() {
     throw new Error('Intentional error from button click!')
   }
 
-  const handleAsyncError = async () => {
+  const handleAsyncError = () => {
     terminal.warn('Starting async operation that will fail...')
-    await new Promise(resolve => setTimeout(resolve, 100))
-    throw new Error('Async error: Operation failed!')
+    // Call async function and let unhandled rejection handler catch it
+    Promise.resolve()
+      .then(() => new Promise(resolve => setTimeout(resolve, 100)))
+      .then(() => {
+        throw new Error('Async error: Operation failed!')
+      })
   }
 
   const handleUnhandledPromise = () => {
