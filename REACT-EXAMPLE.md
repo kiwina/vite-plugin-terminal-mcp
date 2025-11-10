@@ -29,11 +29,10 @@ export default defineConfig({
 
       // Enable MCP server
       mcp: {
-        enabled: true,
         maxLogs: 1000,
         mcpPath: '/__terminal_mcp',
         printUrl: true,
-        updateConfig: 'auto', // Auto-update .cursor/mcp.json
+        updateConfig: 'auto', // Auto-update AI config files
         serverName: 'terminal',
       }
     })

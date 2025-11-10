@@ -328,6 +328,17 @@ Enable MCP (Model Context Protocol) server for AI assistant integration. Set to 
 - Default: `['error', 'warn', 'info', 'log', 'debug', 'assert']` (all)
 - Example: `levels: ['error']` - Only capture errors
 
+**`updateConfig`** - Auto-update AI assistant config files
+- Type: `'auto' | false | Array<'cursor' | 'vscode' | 'windsurf'>`
+- Default: `'auto'`
+- `'auto'` - Automatically updates config files if `.cursor`, `.vscode`, or `~/.codeium/windsurf` exist
+- `false` - Don't update any config files
+- `['cursor', 'vscode']` - Update specific config files only
+- Creates/updates:
+  - **Cursor**: `.cursor/mcp.json`
+  - **VSCode**: `.vscode/mcp.json`
+  - **Windsurf**: `~/.codeium/windsurf/mcp_config.json`
+
 **`silent`** - Suppress terminal output for MCP-captured logs
 - Type: `boolean`
 - Default: `false`

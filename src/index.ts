@@ -1,4 +1,8 @@
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite'
+import { existsSync } from 'node:fs'
+import fs from 'node:fs/promises'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import readline from 'node:readline'
 import rollupPluginStrip from '@rollup/plugin-strip'
 import { lightBlue, lightGray, lightMagenta, lightRed, lightYellow } from 'kolorist'
@@ -58,7 +62,14 @@ export interface Options {
     maxLogs?: number
     mcpPath?: string
     printUrl?: boolean
-    updateConfig?: boolean | Array<'cursor' | 'vscode'>
+    /**
+     * Auto-update AI assistant config files
+     * - 'auto' - Update config files if they exist (.cursor, .vscode, ~/.codeium/windsurf)
+     * - false - Don't update any config files
+     * - ['cursor', 'vscode', 'windsurf'] - Update specific config files
+     * @default 'auto'
+     */
+    updateConfig?: 'auto' | false | Array<'cursor' | 'vscode' | 'windsurf'>
     serverName?: string
     /**
      * Filter which log levels are stored in MCP
@@ -186,6 +197,9 @@ function pluginTerminal(options: Options = {}) {
             setTimeout(() => {
               config.logger.info(`  ${lightBlue('➜')} Terminal MCP: ${url}`)
             }, 300)
+
+            // Update config files
+            await updateMcpConfigs(server.config.root, url, mcpConfig, config)
           }
         }
         catch {
@@ -390,6 +404,87 @@ function createTerminal() {
   }
 
   return defineOutput(terminal)
+}
+
+async function updateMcpConfigs(
+  root: string,
+  mcpUrl: string,
+  mcpConfig: any,
+  config: ResolvedConfig,
+): Promise<void> {
+  const updateConfig = mcpConfig.updateConfig ?? 'auto'
+  const serverName = mcpConfig.serverName || 'vite-plugin-terminal-mcp'
+
+  if (updateConfig === false)
+    return
+
+  const configs = updateConfig === 'auto'
+    ? [
+        existsSync(join(root, '.cursor')) ? 'cursor' as const : null,
+        existsSync(join(root, '.vscode')) ? 'vscode' as const : null,
+        existsSync(join(homedir(), '.codeium', 'windsurf')) ? 'windsurf' as const : null,
+      ].filter(x => x !== null)
+    : Array.isArray(updateConfig)
+      ? updateConfig
+      : []
+
+  // Cursor
+  if (configs.includes('cursor')) {
+    try {
+      await fs.mkdir(join(root, '.cursor'), { recursive: true })
+      const configPath = join(root, '.cursor/mcp.json')
+      const mcp = existsSync(configPath)
+        ? JSON.parse(await fs.readFile(configPath, 'utf-8') || '{}')
+        : {}
+      mcp.mcpServers ||= {}
+      mcp.mcpServers[serverName] = { url: mcpUrl }
+      await fs.writeFile(configPath, `${JSON.stringify(mcp, null, 2)}\n`)
+      config.logger.info(`  ${lightBlue('➜')} Updated ${configPath}`)
+    }
+    catch (e) {
+      config.logger.warn(`  Failed to update Cursor config: ${e}`)
+    }
+  }
+
+  // VSCode
+  if (configs.includes('vscode')) {
+    try {
+      await fs.mkdir(join(root, '.vscode'), { recursive: true })
+      const configPath = join(root, '.vscode/mcp.json')
+      const mcp = existsSync(configPath)
+        ? JSON.parse(await fs.readFile(configPath, 'utf-8') || '{}')
+        : {}
+      mcp.servers ||= {}
+      mcp.servers[serverName] = {
+        type: 'sse',
+        url: mcpUrl,
+      }
+      await fs.writeFile(configPath, `${JSON.stringify(mcp, null, 2)}\n`)
+      config.logger.info(`  ${lightBlue('➜')} Updated ${configPath}`)
+    }
+    catch (e) {
+      config.logger.warn(`  Failed to update VSCode config: ${e}`)
+    }
+  }
+
+  // Windsurf
+  if (configs.includes('windsurf')) {
+    try {
+      const windsurfDir = join(homedir(), '.codeium', 'windsurf')
+      const configPath = join(windsurfDir, 'mcp_config.json')
+      await fs.mkdir(windsurfDir, { recursive: true })
+      const windsurfConfig = existsSync(configPath)
+        ? JSON.parse(await fs.readFile(configPath, 'utf-8').catch(() => '{}') || '{}')
+        : {}
+      windsurfConfig.mcpServers ||= {}
+      windsurfConfig.mcpServers[serverName] = { serverUrl: mcpUrl }
+      await fs.writeFile(configPath, `${JSON.stringify(windsurfConfig, null, 2)}\n`)
+      config.logger.info(`  ${lightBlue('➜')} Updated ${configPath}`)
+    }
+    catch (e) {
+      config.logger.warn(`  Failed to update Windsurf config: ${e}`)
+    }
+  }
 }
 
 export default pluginTerminal
