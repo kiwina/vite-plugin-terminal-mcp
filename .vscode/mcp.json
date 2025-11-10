@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "react": {
+      "type": "http",
+      "url": "http://localhost:3333/__terminal_mcp"
+    }
+  }
+}

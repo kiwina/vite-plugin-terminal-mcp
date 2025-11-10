@@ -1,0 +1,116 @@
+{
+  "name": "vite-plugin-terminal-mcp",
+  "type": "commonjs",
+  "version": "1.3.0",
+  "description": "Log in the node terminal from the browser with MCP server integration",
+  "author": "Matias Capeletto <matias.capeletto@gmail.com>, kiwina",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/patak-dev",
+  "homepage": "https://github.com/kiwina/vite-plugin-terminal-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiwina/vite-plugin-terminal-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kiwina/vite-plugin-terminal-mcp/issues"
+  },
+  "keywords": [
+    "vite-plugin",
+    "mcp",
+    "model-context-protocol",
+    "console",
+    "terminal",
+    "ai"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./client": {
+      "types": "./client.d.ts"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "*.d.ts",
+    "LICENSE",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "rimraf dist && run-s build:*",
+    "build:js": "unbuild",
+    "play:basic": "pnpm -C playground/basic run dev",
+    "play:basic:build": "pnpm -C playground/basic run build",
+    "play:basic:preview": "pnpm -C playground/basic run preview",
+    "play:console": "pnpm -C playground/console run dev",
+    "play:console:build": "pnpm -C playground/console run build",
+    "play:console:preview": "pnpm -C playground/console run preview",
+    "play:autoimport": "pnpm -C playground/autoimport run dev",
+    "play:autoimport:build": "pnpm -C playground/autoimport run build",
+    "play:autoimport:preview": "pnpm -C playground/autoimport run preview",
+    "play:vue": "pnpm -C playground/vue run dev",
+    "play:vue:build": "pnpm -C playground/vue run build",
+    "play:vue:preview": "pnpm -C playground/vue run preview",
+    "play:react": "pnpm -C playground/react run dev",
+    "play:react:build": "pnpm -C playground/react run build",
+    "play:react:preview": "pnpm -C playground/react run preview",
+    "dev:js": "nr build:js --watch src",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest",
+    "prepublishOnly": "pnpm run build",
+    "release": "bumpp --commit --push --tag && pnpm publish"
+  },
+  "peerDependencies": {
+    "vite": "^2.0.0||^3.0.0||^4.0.0||^5.0.0||^6.0.0||^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@rollup/plugin-strip": "catalog:prod",
+    "debug": "catalog:prod",
+    "kolorist": "catalog:prod",
+    "sirv": "catalog:prod",
+    "ufo": "catalog:prod"
+  },
+  "optionalDependencies": {
+    "@modelcontextprotocol/sdk": "catalog:mcp",
+    "pathe": "catalog:mcp",
+    "zod": "catalog:mcp"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:dev",
+    "@antfu/ni": "catalog:dev",
+    "@antfu/utils": "catalog:dev",
+    "@types/debug": "catalog:dev",
+    "@types/fs-extra": "catalog:dev",
+    "@types/node": "catalog:dev",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@vitejs/plugin-react": "catalog:react",
+    "@vitejs/plugin-vue": "catalog:vue",
+    "bumpp": "catalog:dev",
+    "eslint": "catalog:dev",
+    "esno": "catalog:dev",
+    "npm-run-all": "catalog:dev",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "rimraf": "catalog:dev",
+    "typescript": "catalog:typescript",
+    "unbuild": "catalog:dev",
+    "unplugin-auto-import": "catalog:autoimport",
+    "vite": "catalog:vite",
+    "vitest": "catalog:dev",
+    "vue": "catalog:vue"
+  }
+}

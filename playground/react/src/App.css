@@ -1,0 +1,95 @@
+.App {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.card {
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: #242424;
+  border-radius: 8px;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #646cff;
+}
+
+button {
+  margin: 0.5rem;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  border-radius: 8px;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.error-tests button {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.error-tests button:hover {
+  background-color: #f44336;
+  border-color: #ff5252;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+nav a {
+  color: #646cff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #646cff;
+  border-radius: 4px;
+  transition: all 0.25s;
+}
+
+nav a:hover {
+  background-color: #646cff;
+  color: white;
+}
+
+.instructions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #1a472a;
+  border-radius: 8px;
+  border: 2px solid #4caf50;
+}
+
+.instructions h3 {
+  color: #4caf50;
+  margin-top: 0;
+}
+
+.instructions ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 1rem auto;
+}
+
+.instructions li {
+  margin: 0.5rem 0;
+  font-family: 'Courier New', monospace;
+}

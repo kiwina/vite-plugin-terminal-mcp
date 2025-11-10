@@ -1,0 +1,19 @@
+{
+  "name": "playground-autoimport",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "catalog:typescript",
+    "unplugin-auto-import": "catalog:autoimport",
+    "vite": "catalog:vite",
+    "vite-plugin-terminal-mcp": "workspace:*"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {}
+}
