@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-terminal-mcp",
   "type": "commonjs",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Log in the node terminal from the browser with MCP server integration",
   "author": "Kiwina <me@kiwina.com>",
   "license": "MIT",
