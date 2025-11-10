@@ -31,7 +31,7 @@ export function createMCPServer(options: MCPServerOptions): McpServer {
     {
       title: 'Get Console Errors',
       description: 'Retrieve recent console errors from the browser. Returns the most recent error messages logged to the browser console.',
-      inputSchema: { count: z.number() } as any,
+      inputSchema: { count: z.number().optional() } as any,
       outputSchema: { errors: z.array(z.any()) } as any,
     },
     async ({ count }: any) => {
@@ -54,8 +54,8 @@ export function createMCPServer(options: MCPServerOptions): McpServer {
       title: 'Get Console Logs',
       description: 'Retrieve recent console logs from the browser. Can filter by log level (log, info, debug, warn, error).',
       inputSchema: {
-        count: z.number(),
-        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']),
+        count: z.number().optional(),
+        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']).optional(),
       } as any,
       outputSchema: { logs: z.array(z.any()), count: z.number() } as any,
     },
@@ -85,7 +85,7 @@ export function createMCPServer(options: MCPServerOptions): McpServer {
       description: 'Retrieve console logs since a specific timestamp.',
       inputSchema: {
         timestamp: z.number(),
-        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']),
+        level: z.enum(['log', 'info', 'debug', 'warn', 'error', 'assert', 'all']).optional(),
       } as any,
       outputSchema: { logs: z.array(z.any()), count: z.number(), since: z.string() } as any,
     },
